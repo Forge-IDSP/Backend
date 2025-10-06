@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { db, schema } from "../db/client";
+import { db, schema } from "../../db/client";
 
 const testRoute = new Hono();
 
