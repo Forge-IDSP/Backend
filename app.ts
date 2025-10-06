@@ -1,10 +1,12 @@
-import { Hono } from 'hono'
-import { logger } from 'hono/logger'
-const app = new Hono()
+import { Hono } from "hono";
+import { logger } from "hono/logger";
+import testRoute from "./src/routes/test";
 
-app.use("*",logger())
+const app = new Hono();
 
-app.get('/test', (c) => c.text('Hono!'))
+app.use("*", logger());
 
+app.get("/test", (c) => c.text("Hono!"));
+app.route("/api/test", testRoute);
 
-export default app
+export default app;
