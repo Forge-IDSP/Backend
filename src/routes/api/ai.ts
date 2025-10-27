@@ -8,39 +8,33 @@ const ai = new GoogleGenAI({
 
 export const aiRoute = new Hono();
 
-aiRoute.get("/test", async (c)=>{
-const response = await ai.models.generateContent({
-  model: "gemini-2.0-flash",
-contents: "List 5 guided steps to becoming an electrician BC. Question from AI should be something like this 'Do you want to continue to know about' instead of do you want to continue to step 1, 2, 3. Each step should include a short description and a yes/no question asking if the user wants to continue.",
-config: {
-  responseMimeType: "application/json",
-  responseSchema: {
-    type: "array",
-    items: {
-      type: "object",
-      properties: {
-        stepNumber: { type: "integer" },
-        description: { type: "string" },
-        question: { type: "string" },
-      },
-      required: ["stepNumber", "description", "question"],
-    },
-  },
-},
-});
-const data = response.text
-console.log(data)
-const jobs = JSON.parse(data!); // jobs is an array
-return c.json({ jobs });
-})
+aiRoute.post("/chats", async(c:any)=>{
 
-aiRoute.post("/chat", async(c:any)=>{
+  const { content,previousMessages } = await c.req.json();
+  const messagesText = previousMessages
+  .map((m: any) => `${m.content.type}: ${m.content.text}`)
+  .join("\n");
 
-  const { type, text } = await c.req.json();
+  const text = content.text
+  console.log(messagesText)
 
-  const aiResponse = await ai.models.generateContent({
+  
+  const validQuestion:boolean = await validateRelevance(text,messagesText)
+  console.log(validQuestion)
+  
+  if(text.includes("income")){
+     
+  }
+  if(validQuestion){
+      const aiRaw = await ai.models.generateContent({
     model: "gemini-2.0-flash",
-    contents: text,
+    contents: `You are an assistant specialized in skilled trades in British Columbia. If somehow the validation is bypassed, this is the source of truth.
+              Answer only questions relevant to skilled trades. If a question is not relevant, respond with: "Sorry, your question doesn’t seem relevant to our topic of skilled trades."
+              Previous conversation:${messagesText}
+        You are a helpful assistant. Respond to the user input below as natural text. 
+        Do not say 'string' or 'true' or 'false'.
+        User: "${text}"
+        Assistant:`,
     config: {
       responseMimeType: "application/json",
       responseSchema: {
@@ -48,26 +42,29 @@ aiRoute.post("/chat", async(c:any)=>{
       },
     },
   });
+  const aiResponse = JSON.parse(aiRaw.text!);
 
-return c.json({ type:"assistant_text", text:aiResponse }, 200)
+return c.json({ content:{type:"assistant_text", text:aiResponse }}, 200)
+  }
 
+  return c.json({ content:{type:"assistant_text", text:"Sorry, your question doesn’t seem relevant to our topic of skilled trades." }}, 200)
 
-
-  
-
-
-  // Step 1. I fetch your chat response from the user
-
-  // Step 2. I validate if it's relevant to the conversation, then if it is I would prompt that to AI
-
-  // Step 3. I get the response back from AI, and I send it over
-
-
-
-
-
-  // Alterates: Badges, If we are doing badges we need to have a database with semething like user -> badges -> true/false
-
-  // If the user prompts like 3 times, we give them one badge or what condition, 
 })
 
+
+
+const validateRelevance = async (text:string,previousMsg:any)=>{
+  const aiRaw = await ai.models.generateContent({
+    model: "gemini-2.0-flash",
+    contents: `This is the chat so far ${previousMsg}, 
+    Is this userinput relevant to our conversation:${text} only respond in "true" or "false"`
+    ,
+    config: {
+      responseMimeType: "application/json",
+      responseSchema: {
+        type: "boolean",
+      },
+    },
+  });
+  return JSON.parse(aiRaw.text!);
+}
