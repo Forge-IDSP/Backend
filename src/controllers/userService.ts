@@ -9,9 +9,6 @@ export class UserService {
     public async awardUserBadge(userId: string, badgeName: string) {
         return await this._dbService.awardBadge(userId, badgeName);
     }
-   
-
-
 }
 
 export const userService = new UserService(dbService);

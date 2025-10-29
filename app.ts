@@ -5,6 +5,7 @@ import testRoute from "./src/routes/api/test";
 import { clerkMiddleware } from "@hono/clerk-auth";
 import userRoute from "./src/routes/api/users";
 import { aiRoute } from "./src/routes/api/ai";
+import { dbRoute } from "./src/routes/api/db";
 const app = new Hono();
 
 
@@ -21,5 +22,6 @@ app.get("/", (c) => c.text("Hono!"));
 app.route("/api/test", testRoute);
 app.route("/api/user", userRoute);
 app.route("/api/ai",aiRoute);
+app.route("/api/db",dbRoute)
 export default app;
 
