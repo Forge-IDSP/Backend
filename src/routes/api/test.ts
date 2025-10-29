@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import { db, schema } from "../../db/client";
+import type{ UserBadge } from "../../../types/types";
 
 const testRoute = new Hono();
 

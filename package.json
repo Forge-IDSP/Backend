@@ -4,7 +4,10 @@
   "type": "module",
   "scripts": {
     "start": "bun index.ts",
-    "dev": "bun --watch index.ts"
+    "dev": "bun --watch index.ts",
+    "db:generate": "drizzle-kit generate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio"
   },
   "private": true,
   "devDependencies": {
@@ -15,6 +18,7 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "@clerk/clerk-sdk-node": "^5.1.6",
     "@google/genai": "^1.25.0",
     "@hono/clerk-auth": "^3.0.3",
     "@neondatabase/serverless": "^1.0.2",
