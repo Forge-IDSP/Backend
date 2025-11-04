@@ -8,38 +8,44 @@ export class DbController {
     this._dbService = dbService;
   }
 
-  public async getBadgesByTrade(c:Context) { {
-    try {
-      const pattern = c.req.query("trade");
-      
-      if (!pattern || pattern.trim() === "") {
-        return c.json({
-          success: false,
-          error: "Search pattern is required",
-          data: null
-        }, 400);
-      }
+  public async getBadgesByTrade(c: Context) {
+    {
+      try {
+        const pattern = c.req.query("trade");
 
-      const badges = await this._dbService.getBadgesByPattern(pattern);
-      return c.json({
-        success: true,
-        badges,
-        error: null
-      }, 200);
-    } catch (error) {
-      console.error("Error in getBadgesByPattern:", error);
-      return c.json({
-        success: false,
-        error: "Failed to fetch badges",
-        data: null
-      }, 500);
+        if (!pattern || pattern.trim() === "") {
+          return c.json(
+            {
+              success: false,
+              error: "Search pattern is required",
+              data: null,
+            },
+            400
+          );
+        }
+
+        const badges = await this._dbService.getBadgesByPattern(pattern);
+        return c.json(
+          {
+            success: true,
+            badges,
+            error: null,
+          },
+          200
+        );
+      } catch (error) {
+        console.error("Error in getBadgesByPattern:", error);
+        return c.json(
+          {
+            success: false,
+            error: "Failed to fetch badges",
+            data: null,
+          },
+          500
+        );
+      }
     }
   }
-
-
-  }
-
-
 }
 
 // Create singleton instance
