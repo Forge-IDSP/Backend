@@ -1,4 +1,10 @@
-import { eq, like, desc, and } from "drizzle-orm";
+import { desc, eq, like } from "drizzle-orm";
+import type {
+  CareerPath,
+  JobDetail,
+  SkillLevel,
+  UserBadge,
+} from "../../types/types";
 import { db, schema, type Database } from "../db/client";
 import type { UserBadge } from "../../types/types";
 import { createClient } from "redis";
@@ -36,6 +42,7 @@ export class DbService {
       return { success: false, error };
     }
   }
+  
   public async getAllUserBadges(userId: string): Promise<UserBadge[]> {
     const cacheKey = `user:${userId}:badges`;
     return await this._database
@@ -72,6 +79,7 @@ export class DbService {
       .from(schema.incomeCards)
       .where(eq(schema.incomeCards.trade, tradeName));
   }
+
   //Private helper methods
   private async getBadgeByName(badgeName: string) {
     const result = await this._database
@@ -86,8 +94,62 @@ export class DbService {
       .limit(1);
     return result[0] || null;
   }
+  // in-demands jobs list
+  public async getAllInDemandJobs() {
+    return await this._database
+      .select({
+        title: schema.jobs.title,
+        description: schema.jobs.description,
+        icon: schema.jobs.icon,
+      })
+      .from(schema.jobs);
+  }
+
+  public async getJobDetailByTitle(title: string): Promise<JobDetail | null> {
+    // if (!title) return nul;
+
+    const job = await this._database.query.jobs.findFirst({
+      where: (jobs, { eq }) => eq(jobs.title, title),
+      with: {
+        dailyRoutines: true,
+        jobSkills: true,
+        careerPaths: true,
+      },
+    });
+
+    if (!job) return null;
+    const jobDetail: JobDetail = {
+      id: job.id,
+      title: job.title,
+      description: job.description,
+      icon: job.icon,
+      dailyRoutines: job.dailyRoutines.map((r) => r.text),
+      skillsRequired: job.jobSkills.map(
+        (s): SkillLevel => ({
+          skill: s.skill,
+          priority: s.priority as SkillLevel["priority"],
+        })
+      ),
+      careerPath: job.careerPaths.map(
+        (c): CareerPath => ({
+          level: c.level as CareerPath["level"],
+          description: c.description,
+          minIncome: c.minIncome,
+          income: c.income,
+          year: c.year,
+          trainingRequired: c.trainingRequired,
+          trainingYear: c.trainingYear,
+        })
+      ),
+    };
+
+    return jobDetail;
+  }
 }
 
 export const dbService = new DbService(db, process.env.REDIS_SERVER!);
 
+// console.log(await dbService.getBadgesByPattern("electrician"));
+
+// console.log(await dbService.getIncomeCardsByTrade("electrician"));
 console.log(await dbService.getIncomeCardsByTrade("electrician"));
