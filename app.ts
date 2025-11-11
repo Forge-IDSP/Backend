@@ -10,6 +10,11 @@ import testRoute from "./src/routes/api/test";
 import userRoute from "./src/routes/api/users";
 const app = new Hono();
 
+import { clerkMiddleware } from "@hono/clerk-auth";
+
+
+const app = new Hono();
+
 app.use(
   "*",
   cors({
@@ -23,7 +28,6 @@ app.use("*", logger());
 app.use("*", clerkMiddleware());
 app.get("/", (c) => c.text("Hono!"));
 
-app.route("/api/test", testRoute);
 app.route("/api/user", userRoute);
 app.route("/api/ai", aiRoute);
 app.route("/api/db", dbRoute);

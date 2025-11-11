@@ -6,11 +6,17 @@ import type {
   UserBadge,
 } from "../../types/types";
 import { db, schema, type Database } from "../db/client";
+import type { UserBadge } from "../../types/types";
+import { createClient } from "redis";
+import type { RedisClientType } from "redis";
+
 export class DbService {
   private _database: Database;
+  private _redis: RedisClientType;
 
-  constructor(dbConnection: Database) {
+  constructor(dbConnection: Database, redisServer: string) {
     this._database = dbConnection;
+    this._redis = createClient({ url: redisServer });
   }
   //public methods
   public async awardBadge(userId: string, badgeName: string) {
@@ -36,8 +42,9 @@ export class DbService {
       return { success: false, error };
     }
   }
-
+  
   public async getAllUserBadges(userId: string): Promise<UserBadge[]> {
+    const cacheKey = `user:${userId}:badges`;
     return await this._database
       .select({
         title: schema.badges.title,
@@ -140,8 +147,9 @@ export class DbService {
   }
 }
 
-export const dbService = new DbService(db);
+export const dbService = new DbService(db, process.env.REDIS_SERVER!);
 
 // console.log(await dbService.getBadgesByPattern("electrician"));
 
 // console.log(await dbService.getIncomeCardsByTrade("electrician"));
+console.log(await dbService.getIncomeCardsByTrade("electrician"));

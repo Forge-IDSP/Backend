@@ -13,6 +13,7 @@ export class DbController {
       try {
         const pattern = c.req.query("trade");
         // /badge?trade=
+
         if (!pattern || pattern.trim() === "") {
           return c.json(
             {
