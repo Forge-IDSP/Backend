@@ -6,7 +6,6 @@ import type {
   UserBadge,
 } from "../../types/types";
 import { db, schema, type Database } from "../db/client";
-import type { UserBadge } from "../../types/types";
 import { createClient } from "redis";
 import type { RedisClientType } from "redis";
 
@@ -42,7 +41,7 @@ export class DbService {
       return { success: false, error };
     }
   }
-  
+
   public async getAllUserBadges(userId: string): Promise<UserBadge[]> {
     const cacheKey = `user:${userId}:badges`;
     return await this._database

@@ -6,13 +6,7 @@ import { aiRoute } from "./src/routes/api/ai";
 import { dbRoute } from "./src/routes/api/db";
 import { quizRoute } from "./src/routes/api/quiz";
 import { simulationRoute } from "./src/routes/api/simulation";
-import testRoute from "./src/routes/api/test";
 import userRoute from "./src/routes/api/users";
-const app = new Hono();
-
-import { clerkMiddleware } from "@hono/clerk-auth";
-
-
 const app = new Hono();
 
 app.use(
