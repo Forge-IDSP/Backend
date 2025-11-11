@@ -31,3 +31,8 @@ export type JobDetail = Job & {
   skillsRequired: SkillLevel[];
   careerPath: CareerPath[];
 };
+
+export type User = {
+  id: string;
+  badges: string[];
+};

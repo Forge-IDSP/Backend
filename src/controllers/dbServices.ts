@@ -99,7 +99,7 @@ export class DbService {
   }
 
   public async getJobDetailByTitle(title: string): Promise<JobDetail | null> {
-    if (!title) return null;
+    // if (!title) return nul;
 
     const job = await this._database.query.jobs.findFirst({
       where: (jobs, { eq }) => eq(jobs.title, title),
