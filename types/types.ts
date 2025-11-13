@@ -36,3 +36,10 @@ export type User = {
   id: string;
   badges: string[];
 };
+
+export type Employer = {
+  id: number;
+  title: string;
+  description: string;
+  logo?: string | null;
+};

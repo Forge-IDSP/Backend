@@ -1,6 +1,7 @@
 import { desc, eq, like } from "drizzle-orm";
 import type {
   CareerPath,
+  Employer,
   JobDetail,
   SkillLevel,
   UserBadge,
@@ -137,6 +138,22 @@ export class DbService {
     };
 
     return jobDetail;
+  }
+
+  public async getAllEmployersByCareerName(
+    careerName: string
+  ): Promise<Employer[]> {
+    const careerNameLower = careerName.trim().toLowerCase();
+    const result = await this._database
+      .select({
+        id: schema.employers.id,
+        title: schema.employers.title,
+        description: schema.employers.description,
+        logo: schema.employers.logo,
+      })
+      .from(schema.employers)
+      .where(eq(schema.employers.careerName, careerNameLower));
+    return result;
   }
 }
 

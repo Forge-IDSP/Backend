@@ -95,6 +95,33 @@ export class DbController {
       );
     }
   }
+
+  public async getAllEmployersByCareerName(c: Context) {
+    try {
+      const careerName = c.req.param("careerName");
+      if (!careerName) return;
+      const trim = String(careerName).trim();
+      const employers = await this._dbService.getAllEmployersByCareerName(trim);
+      return c.json(
+        {
+          success: true,
+          employers,
+          error: null,
+        },
+        200
+      );
+    } catch (error) {
+      console.log("Error in getEmployerByCareerName:", error);
+      return c.json(
+        {
+          success: false,
+          error: "Failed to fetch employers",
+          data: null,
+        },
+        500
+      );
+    }
+  }
 }
 
 // Create singleton instance
