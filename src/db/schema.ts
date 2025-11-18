@@ -6,6 +6,9 @@ import {
   timestamp,
   unique,
   varchar,
+  primaryKey, 
+  jsonb,
+  text
 } from "drizzle-orm/pg-core";
 
 export const badges = pgTable("badges", {
@@ -79,6 +82,19 @@ export const careerPaths = pgTable("career_paths", {
   trainingRequired: varchar("training_required", { length: 500 }).notNull(),
   trainingYear: varchar("training_year", { length: 50 }).notNull(),
 });
+
+export const pathways = pgTable("pathways", {
+    id: text("id").notNull(),
+    templateSlug: text("template_slug").notNull(),
+    steps: jsonb("steps").notNull(),         
+    updatedAt: timestamp("updated_at", {
+      withTimezone: true,
+    }).notNull(),
+  },
+  (table) => ({
+    pk: primaryKey({ columns: [table.id] }),
+  })
+);
 
 // jobdetail = job + dailyroutines + jobskills + careerpath
 export const jobsRelations = relations(jobs, ({ many }) => ({
