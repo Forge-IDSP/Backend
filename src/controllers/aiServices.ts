@@ -358,7 +358,9 @@ export class AiService {
       shouldProgress = true;
       contextPrompt = `The user is ready to progress from Step ${step}. 
       Acknowledge their readiness and provide a transition message.
-      Be encouraging and positive about moving forward.`;
+      Be encouraging and positive about moving forward.
+      End with a statement like "Let's move forward!" or "Time to advance!" 
+      DO NOT ask "What are you curious about?" or any other questions.`;
     } else if (context.isProgressionQuestion && !context.isReady) {
       contextPrompt = `The user isn't ready to move forward yet from Step ${step}.
       Offer encouragement and ask what additional information they need.
