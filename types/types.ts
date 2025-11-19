@@ -12,24 +12,17 @@ export interface ChatMessage {
   };
 }
 
+// Update your AiResponse type
 export interface AiResponse {
   text: string;
-  type: string;
-  checkPointIndex: number;
+  type: "assistant_text";
+  shouldProgress: boolean; // 🔥 Replace checkPointIndex with this
 }
 export interface ChatRequestBody {
   userResponse: string;
   chatHistory: ChatMessage[];
-  currentCheckpoint: number;
-  checkpoints: string[];
+  step: number; // 🔥 Remove currentCheckpoint and checkpoints
 }
-
-export interface UserBadge {
-  title: string;
-  text: string;
-  icon: string;
-}
-
 export type Job = {
   id: number;
   title: string;
@@ -61,4 +54,35 @@ export type JobDetail = Job & {
 export type User = {
   id: string;
   badges: string[];
+};
+
+export type DailyRoutineResponse = {
+  title: string;
+  items: string[];
+};
+
+export type QuizAnswers = {
+  interest: string;
+  environment: string;
+  workStyle: string;
+  priority: string;
+};
+
+export type QuizRecommendation = {
+  careerName: string;
+  summary: string;
+  reasons: string[];
+  nextSteps: string[];
+};
+
+export type Employer = {
+  id: number;
+  title: string;
+  description: string;
+  logo?: string | undefined;
+};
+
+export type Step3Level = {
+  title: string;
+  items: string[];
 };

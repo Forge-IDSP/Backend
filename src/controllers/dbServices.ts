@@ -1,6 +1,7 @@
-import { desc, eq, like } from "drizzle-orm";
+import { desc, eq, like, sql } from "drizzle-orm";
 import type {
   CareerPath,
+  Employer,
   JobDetail,
   SkillLevel,
   UserBadge,
@@ -143,6 +144,58 @@ export class DbService {
     };
 
     return jobDetail;
+  }
+  public async getDailyJobRoutine(career: string): Promise<string[]> {
+    try {
+      const decodedCareer = decodeURIComponent(career);
+
+      const jobResult = await this._database
+        .select()
+        .from(schema.jobs)
+        .where(eq(schema.jobs.title, decodedCareer))
+        .limit(1);
+
+      const job = jobResult[0];
+
+      if (!job) {
+        console.log(`No job found for career: ${career}`);
+        return [];
+      }
+      const routines = await this._database
+        .select({
+          text: schema.dailyRoutines.text,
+        })
+        .from(schema.dailyRoutines)
+        .where(eq(schema.dailyRoutines.jobId, job.id));
+
+      return routines.map((routine) => routine.text);
+    } catch (error) {
+      console.error(`Error fetching daily routines for ${career}:`, error);
+      return [];
+    }
+  }
+  public async getEmployers(career: string): Promise<Employer[]> {
+    try {
+      const employers = await this._database
+        .select({
+          id: schema.employers.id,
+          title: schema.employers.title,
+          description: schema.employers.description,
+          logo: schema.employers.logo,
+        })
+        .from(schema.employers)
+        .where(eq(schema.employers.careerName, career.toLowerCase()));
+
+      return employers.map((emp) => ({
+        id: emp.id,
+        title: emp.title,
+        description: emp.description,
+        logo: emp.logo || undefined,
+      }));
+    } catch (error) {
+      console.error(`Error fetching employers for ${career}:`, error);
+      return [];
+    }
   }
 }
 
