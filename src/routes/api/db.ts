@@ -7,3 +7,4 @@ dbRoute.get("/badges", (c) => dbController.getBadgesByTrade(c));
 
 dbRoute.get("/in-demands", (c) => dbController.getInDemands(c));
 
+dbRoute.get("/in-demands/:title", (c) => dbController.getJobDetailByTitle(c));

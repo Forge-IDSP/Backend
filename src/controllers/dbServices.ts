@@ -2,6 +2,9 @@ import { desc, eq, like, sql } from "drizzle-orm";
 import type {
   CareerPath,
   Employer,
+import { desc, eq, like } from "drizzle-orm";
+import type {
+  CareerPath,
   JobDetail,
   SkillLevel,
   UserBadge,
@@ -44,7 +47,6 @@ export class DbService {
   }
 
   public async getAllUserBadges(userId: string): Promise<UserBadge[]> {
-    const cacheKey = `user:${userId}:badges`;
     return await this._database
       .select({
         title: schema.badges.title,
@@ -107,6 +109,7 @@ export class DbService {
 
   public async getJobDetailByTitle(title: string): Promise<JobDetail | null> {
     // if (!title) return nul;
+    if (!title) return null;
 
     const job = await this._database.query.jobs.findFirst({
       where: (jobs, { eq }) => eq(jobs.title, title),
