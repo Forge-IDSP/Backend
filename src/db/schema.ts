@@ -123,3 +123,11 @@ export const careerPathsRelations = relations(careerPaths, ({ one }) => ({
     references: [jobs.id],
   }),
 }));
+
+export const employers = pgTable("employers", {
+  id: serial("id").primaryKey(),
+  careerName: varchar("career_name", { length: 50 }).notNull(),
+  title: varchar("title", { length: 50 }).notNull(),
+  description: varchar("description", { length: 500 }).notNull(),
+  logo: varchar("logo", { length: 255 }),
+});

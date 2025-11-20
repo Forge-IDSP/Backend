@@ -1,10 +1,11 @@
+import { clerkMiddleware } from "@hono/clerk-auth";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
-import { clerkMiddleware } from "@hono/clerk-auth";
-import userRoute from "./src/routes/api/users";
 import { aiRoute } from "./src/routes/api/ai";
 import { dbRoute } from "./src/routes/api/db";
+import { simulationRoute } from "./src/routes/api/simulation";
+import userRoute from "./src/routes/api/users";
 import pathwaysRoute from "./src/routes/api/pathways"
 
 
@@ -26,6 +27,7 @@ app.get("/", (c) => c.text("Hono!"));
 app.route("/api/user", userRoute);
 app.route("/api/ai", aiRoute);
 app.route("/api/db", dbRoute);
+app.route("/api/simulation", simulationRoute);
 app.route("/api/pathways", pathwaysRoute);
 
 export default app;

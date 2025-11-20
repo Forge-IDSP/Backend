@@ -1,3 +1,7 @@
+import { desc, eq, like, sql } from "drizzle-orm";
+import type {
+  CareerPath,
+  Employer,
 import { desc, eq, like } from "drizzle-orm";
 import type {
   CareerPath,
@@ -6,6 +10,9 @@ import type {
   UserBadge,
 } from "../../types/types";
 import { db, schema, type Database } from "../db/client";
+import { createClient } from "redis";
+import type { RedisClientType } from "redis";
+
 export class DbService {
   private _database: Database;
   private _redis: RedisClientType;
@@ -101,6 +108,7 @@ export class DbService {
   }
 
   public async getJobDetailByTitle(title: string): Promise<JobDetail | null> {
+    // if (!title) return nul;
     if (!title) return null;
 
     const job = await this._database.query.jobs.findFirst({
@@ -140,6 +148,58 @@ export class DbService {
 
     return jobDetail;
   }
+  public async getDailyJobRoutine(career: string): Promise<string[]> {
+    try {
+      const decodedCareer = decodeURIComponent(career);
+
+      const jobResult = await this._database
+        .select()
+        .from(schema.jobs)
+        .where(eq(schema.jobs.title, decodedCareer))
+        .limit(1);
+
+      const job = jobResult[0];
+
+      if (!job) {
+        console.log(`No job found for career: ${career}`);
+        return [];
+      }
+      const routines = await this._database
+        .select({
+          text: schema.dailyRoutines.text,
+        })
+        .from(schema.dailyRoutines)
+        .where(eq(schema.dailyRoutines.jobId, job.id));
+
+      return routines.map((routine) => routine.text);
+    } catch (error) {
+      console.error(`Error fetching daily routines for ${career}:`, error);
+      return [];
+    }
+  }
+  public async getEmployers(career: string): Promise<Employer[]> {
+    try {
+      const employers = await this._database
+        .select({
+          id: schema.employers.id,
+          title: schema.employers.title,
+          description: schema.employers.description,
+          logo: schema.employers.logo,
+        })
+        .from(schema.employers)
+        .where(eq(schema.employers.careerName, career.toLowerCase()));
+
+      return employers.map((emp) => ({
+        id: emp.id,
+        title: emp.title,
+        description: emp.description,
+        logo: emp.logo || undefined,
+      }));
+    } catch (error) {
+      console.error(`Error fetching employers for ${career}:`, error);
+      return [];
+    }
+  }
 }
 
 export const dbService = new DbService(db, process.env.REDIS_SERVER!);
@@ -147,3 +207,4 @@ export const dbService = new DbService(db, process.env.REDIS_SERVER!);
 // console.log(await dbService.getBadgesByPattern("electrician"));
 
 // console.log(await dbService.getIncomeCardsByTrade("electrician"));
+console.log(await dbService.getIncomeCardsByTrade("electrician"));

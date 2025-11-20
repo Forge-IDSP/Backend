@@ -1,0 +1,156 @@
+// controllers/AiController.ts
+import { aiService, AiService } from "../controllers/aiServices";
+import type { Context } from "hono";
+import type {
+  ChatRequestBody,
+  QuizAnswers,
+  Step3Level,
+} from "../../types/types";
+
+export class AiController {
+  private _aiService: AiService;
+
+  constructor(aiService: AiService) {
+    this._aiService = aiService;
+  }
+
+  public async getChatResponse(c: Context) {
+    try {
+      const {
+        userResponse,
+        chatHistory,
+        step, // Add step to the request body type
+      } = await c.req.json<ChatRequestBody>();
+
+      const response = await this._aiService.aiResponse(
+        userResponse,
+        chatHistory,
+        step // Pass step to the service
+      );
+      console.log(response);
+      return c.json(
+        {
+          success: true,
+          data: response,
+          error: null,
+        },
+        200
+      );
+    } catch (error) {
+      console.error(error);
+      return c.json(
+        {
+          success: false,
+          error: "Failed to generate AI response",
+          data: null,
+        },
+        500
+      );
+    }
+  }
+  public async getCareerData(c: Context) {
+    const { careerName }: { careerName: string } = await c.req.json();
+
+    // const response = this._aiService.getCareerData(careerName);
+  }
+  public async initializeCareer(c: Context) {
+    try {
+      const body = await c.req.json();
+      const { trade } = body;
+
+      if (!trade || typeof trade !== "string") {
+        return c.json(
+          {
+            success: false,
+            error: "Trade is required",
+            data: null,
+          },
+          400
+        );
+      }
+
+      const checkpoints = await this._aiService.initializeCareerPath(trade);
+
+      return c.json(
+        {
+          success: true,
+          data: {
+            trade,
+            checkpoints,
+          },
+          error: null,
+        },
+        200
+      );
+    } catch (error) {
+      console.error("Error in initializeCareer:", error);
+      return c.json(
+        {
+          success: false,
+          error: "Failed to initialize career path",
+          data: null,
+        },
+        500
+      );
+    }
+  }
+  public async matchCareer(c: Context) {
+    const {
+      userId,
+      quizAnswers,
+    }: { userId: string; quizAnswers: QuizAnswers } = await c.req.json();
+    console.log(quizAnswers);
+
+    const data = await this._aiService.getCareerData(quizAnswers);
+
+    const newMsg = {
+      id: `quiz_ack_${Date.now()}`,
+      content: {
+        type: "assistant_text" as const,
+        careerRecommendation: data.careerName,
+        text: `Nice work! Based on your answers, I recommend the trade: **${
+          data.careerName
+        }**.
+
+${data.summary}
+
+Why it fits you:
+- ${data.reasons.join("\n- ")}
+`,
+      },
+    };
+
+    return c.json(newMsg, 200);
+  }
+  public async getApprenticeLevels(c: Context) {
+    try {
+      const careerName = c.req.param("careerName");
+
+      if (!careerName) {
+        return c.json(
+          {
+            error: "Career name is required",
+            levels: [],
+          },
+          400
+        );
+      }
+
+      const decodedCareerName = decodeURIComponent(careerName);
+
+      console.log(`Generating apprentice levels for: ${decodedCareerName}`);
+
+      const levels = await this._aiService.getApprenticeLevels(
+        decodedCareerName
+      );
+
+      return c.json({
+        levels,
+      });
+    } catch (error) {
+      console.error("Error generating apprentice levels:", error);
+    }
+  }
+}
+
+export const aiController = new AiController(aiService);

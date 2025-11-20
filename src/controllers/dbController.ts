@@ -13,6 +13,7 @@ export class DbController {
       try {
         const pattern = c.req.query("trade");
         // /badge?trade=
+
         if (!pattern || pattern.trim() === "") {
           return c.json(
             {
@@ -90,6 +91,50 @@ export class DbController {
           success: false,
           error: "Failed to fetch getJobDetails",
           data: null,
+        },
+        500
+      );
+    }
+  }
+  public async getDailyJobRoutine(c: Context) {
+    try {
+      const { careerName }: { careerName: string } = await c.req.json();
+      const jobRoutine = await this._dbService.getDailyJobRoutine(careerName);
+
+      return c.json({
+        items: jobRoutine || [],
+      });
+    } catch (error) {
+      console.error("Error fetching daily routines:", error);
+
+      return c.json(
+        {
+          error: "Failed to fetch daily routines",
+          items: [],
+        },
+        500
+      );
+    }
+  }
+  public async getEmployers(c: Context) {
+    try {
+      // For some reason we are not being consistent with how we want to send data :)
+      const careerName = c.req.param("careerName");
+
+      const decodedCareerName = decodeURIComponent(careerName);
+
+      const employers = await this._dbService.getEmployers(decodedCareerName);
+
+      return c.json({
+        employers,
+      });
+    } catch (error) {
+      console.error("Error fetching daily routines:", error);
+
+      return c.json(
+        {
+          error: "Failed to fetch daily routines",
+          items: [],
         },
         500
       );

@@ -1,0 +1,34 @@
+{
+  "job_title": "Service Electrician",
+  "company": "Alpine West System Electrical",
+  "location": "Vancouver, BC",
+  "job_type": ["Apprentice", "Electrician", "Full-Time"],
+  "job_opportunity": {
+    "description": "AWSE is seeking a qualified Service Electrician to provide high-quality professional services. We are seeking an individual who can work independently, troubleshoot, and represent the company in a professional manner."
+  },
+  "pay": {
+    "wage": {
+      "min": 32,
+      "max": 45,
+      "currency": "CAD",
+      "unit": "hour"
+    },
+    "industry_average": 37.34
+  },
+  "responsibilities": [
+    "Accurately and independently respond and complete service requests",
+    "Communicate with clients on-site and answer any questions",
+    "Troubleshoot and perform service to resolve customer complaints or concerns",
+    "Complete paperwork, and maintain our company computer applications"
+  ],
+  "qualifications": [
+    { "name": "Journeymen/Red Seal", "importance": "Essential" },
+    { "name": "Clean Driving Record", "importance": "Essential" },
+    { "name": "Background Check", "importance": "Essential" },
+    { "name": "Previous Service Experience", "importance": "Preferred" }
+  ],
+  "cta": {
+    "button_text": "Visit Website"
+  },
+  "timestamp": "03:24"
+}
