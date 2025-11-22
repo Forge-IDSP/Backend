@@ -360,16 +360,19 @@ export class AiService {
       Acknowledge their readiness and provide a transition message.
       Be encouraging and positive about moving forward.
       End with a statement like "Let's move forward!" or "Time to advance!" 
-      DO NOT ask "What are you curious about?" or any other questions.`;
+      DO NOT ask "What are you curious about?" or any other questions.
+      Keep the message to 2-3 sentences.`;
     } else if (context.isProgressionQuestion && !context.isReady) {
       contextPrompt = `The user isn't ready to move forward yet from Step ${step}.
       Offer encouragement and ask what additional information they need.
-      DO NOT ask about progression again.`;
+      DO NOT ask about progression again.
+      Keep the message to 2-3 sentences.`;
     } else {
       contextPrompt = `Continue the conversation naturally for Step ${step}. 
       Help the user explore skilled trades careers based on their interests and questions.
       After 2-3 meaningful exchanges, you may ask if they're ready to move forward.
-      Focus on providing helpful information about their current stage.`;
+      Focus on providing helpful information about their current stage.
+      Keep the message to 2-3 sentences.`;
     }
 
     const aiRaw = await this._gemini.models.generateContent({
