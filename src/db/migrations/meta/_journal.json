@@ -36,6 +36,13 @@
       "when": 1763278297373,
       "tag": "0004_tense_squadron_supreme",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1763842334305,
+      "tag": "0005_loose_silver_samurai",
+      "breakpoints": true
     }
   ]
 }

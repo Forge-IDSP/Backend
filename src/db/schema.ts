@@ -106,7 +106,7 @@ export const careerPaths = pgTable("career_paths", {
 export const pathways = pgTable("pathways", {
     id: text("id").notNull(),
     templateSlug: text("template_slug").notNull(),
-    steps: jsonb("steps").notNull(),         
+    steps: jsonb("steps").$type<Step[]>().notNull(),        
     updatedAt: timestamp("updated_at", {
       withTimezone: true,
     }).notNull(),
@@ -128,9 +128,10 @@ export const myPathways = pgTable("my_pathways", {
   aiSummary: text("ai_summary"), // 1–3 sentence summary
   aiShortLabel: varchar("ai_short_label", { length: 150 }),
 
-  steps: jsonb("steps").notNull(), // .$type<Step[]>()
+  steps: jsonb("steps").$type<Step[]>().notNull(),
 
-  aiData: jsonb("ai_data"), // .$type<MyPathwayAiData>()
+aiData: jsonb("ai_data").$type<MyPathwayAiData>(),
+
 
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()
