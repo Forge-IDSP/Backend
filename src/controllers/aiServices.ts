@@ -417,9 +417,9 @@ export class AiService {
         
         Look for progression indicators like:
         - "I'm ready for apprenticeships"
-        - "I think I'm ready to move on"  // 🔥 ADD THIS
-        - "actually I think I'm ready"    // 🔥 ADD THIS  
-        - "ready to move on"              // 🔥 ADD THIS
+        - "I think I'm ready to move on"  
+        - "actually I think I'm ready"   
+        - "ready to move on"              
         - "Let's learn about the next step"
         - "What comes after foundation?"
         
@@ -457,7 +457,8 @@ export class AiService {
         - How foundation prepares for apprenticeship
         - Career opportunities after completion
         
-        Be encouraging and informative. Only ask about progression when appropriate.`;
+        Be encouraging and informative. Only ask about progression when appropriate.
+        Keep the message to 2-3 sentences.`;
 
       case 3:
         return `${baseInstruction} You're discussing completed apprenticeship levels.
@@ -469,7 +470,8 @@ export class AiService {
         - Skills development journey
         - Next steps in their career path
         
-        Be encouraging about their completion and answer their questions thoroughly.`;
+        Be encouraging about their completion and answer their questions thoroughly.
+        Keep the message to 2-3 sentences.`;
 
       default:
         return baseInstruction;
