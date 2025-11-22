@@ -7,6 +7,13 @@ import { dbRoute } from "./src/routes/api/db";
 import { simulationRoute } from "./src/routes/api/simulation";
 import userRoute from "./src/routes/api/users";
 import pathwaysRoute from "./src/routes/api/pathways"
+import { aiController } from "./src/controllers/aiController";
+import {
+  listPathways,
+  getPathwayById,
+  deletePathwayById,
+} from "./src/controllers/pathwayService";
+
 
 
 const app = new Hono();
@@ -29,5 +36,44 @@ app.route("/api/ai", aiRoute);
 app.route("/api/db", dbRoute);
 app.route("/api/simulation", simulationRoute);
 app.route("/api/pathways", pathwaysRoute);
+
+app.post("/ai/createMyPathway", async (c) => {
+  return await aiController.createMyPathway(c);
+});
+
+// List "my pathways" via /my-pathways?userId=...
+app.get("/my-pathways", async (c) => {
+  const userId = c.req.query("userId");
+
+  const all = await listPathways();
+
+  // If userId is passed, filter; otherwise return all
+  const mine = userId
+    ? all.filter((p: any) => p.userId === userId)
+    : all;
+
+  // Frontend often expects { data: [...] }
+  return c.json({ data: mine });
+});
+
+// Detail: /api/my-pathways/:id (PathwaySummaryScreen)
+app.get("/api/my-pathways/:id", async (c) => {
+  const id = c.req.param("id");
+  const p = await getPathwayById(id);
+
+  if (!p) {
+    return c.json({ error: "Not found" }, 404);
+  }
+
+  // Frontend does res.data?.data
+  return c.json({ data: p });
+});
+
+// Delete: /api/my-pathways/:id
+app.delete("/api/my-pathways/:id", async (c) => {
+  const id = c.req.param("id");
+  await deletePathwayById(id);
+  return c.json({ ok: true });
+});
 
 export default app;
