@@ -2,9 +2,6 @@ import { desc, eq, like, sql } from "drizzle-orm";
 import type {
   CareerPath,
   Employer,
-import { desc, eq, like } from "drizzle-orm";
-import type {
-  CareerPath,
   JobDetail,
   SkillLevel,
   UserBadge,
