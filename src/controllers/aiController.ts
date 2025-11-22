@@ -6,6 +6,8 @@ import type {
   QuizAnswers,
   Step3Level,
 } from "../../types/types";
+import { createMyPathway } from "../controllers/myPathwayService";
+import type { Step } from "../db/schema"
 
 export class AiController {
   private _aiService: AiService;
@@ -151,6 +153,75 @@ Why it fits you:
       console.error("Error generating apprentice levels:", error);
     }
   }
+public async createMyPathway(c: Context) {
+  try {
+    const { userId, quizAnswers } = await c.req.json();
+
+    // 1. Quiz
+    const quiz = await this._aiService.getCareerData(quizAnswers);
+    const trade = quiz.careerName;
+
+    // 2. Intro
+    const careerIntro = await this._aiService.initializeCareerPath(trade);
+
+    // 3. Levels
+    const apprenticeLevels = await this._aiService.getApprenticeLevels(trade);
+
+    // 4. Steps
+    const steps: Step[] = [
+      {
+        title: `Welcome to the ${trade} Pathway`,
+        subtitle: careerIntro.onboardingMessage,
+        meta: "Intro",
+      },
+      ...careerIntro.checkpoints.map((cp: string, index: number) => ({
+        title: cp,
+        subtitle: apprenticeLevels[index]
+          ? apprenticeLevels[index].items.join(" • ")
+          : undefined,
+        meta: `Stage ${index + 1}`,
+      })),
+    ];
+
+    // 5. Summary
+    const aiSummary = quiz.summary;
+
+    // 6. Full AI payload
+    const aiData = {
+      trade,
+      quizRecommendation: quiz,
+      careerIntro,
+      apprenticeLevels,
+    };
+
+    // 7. Title
+    const title = `${trade} Pathway`;
+
+    // 8. Badges
+    const badgeNames = ["jobs", trade.toLowerCase()];
+
+    // 9. Save
+    const saved = await createMyPathway({
+      userId,
+      title,
+      steps,
+      aiSummary,
+      aiData,
+      badgeNames,
+    });
+
+    return c.json({ success: true, data: saved, error: null }, 200);
+  } catch (error) {
+    console.error("Error creating pathway:", error);
+    return c.json({
+      success: false,
+      error: "Failed to create pathway",
+      data: null,
+    }, 500);
+  }
+}
+
+
 }
 
 export const aiController = new AiController(aiService);

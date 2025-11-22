@@ -7,6 +7,9 @@ import type {
   Step3Level,
   QuizRecommendation,
 } from "../../types/types";
+import { createMyPathway } from "../controllers/myPathwayService";
+import type { Step } from "../db/schema"
+
 import "dotenv/config";
 const contextForValidation = `You are analyzing a conversation between Anna (career counselor) and a user.
 
@@ -480,3 +483,4 @@ export class AiService {
 }
 
 export const aiService = new AiService(process.env.GEMINI_API_KEY!);
+
