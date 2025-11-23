@@ -19,6 +19,8 @@ export type MyPathwayAiData = {
     careerName: string;
     summary: string;
     reasons: string[];
+    jobGrowthNote?: string;
+
   };
   careerIntro?: {
     checkpoints: string[];
