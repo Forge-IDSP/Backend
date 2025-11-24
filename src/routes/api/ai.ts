@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { aiController } from "../../controllers/aiController";
 
+
 export const aiRoute = new Hono();
 
 aiRoute.post("/chats", async (c: any) => {
@@ -10,3 +11,8 @@ aiRoute.post("/chats", async (c: any) => {
 aiRoute.post("/matchCareer", async (c: any) => {
   return await aiController.matchCareer(c);
 });
+
+aiRoute.post("/createMyPathway", async(c: any) =>{
+  return await aiController.createMyPathway(c);
+})
+

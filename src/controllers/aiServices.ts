@@ -7,6 +7,7 @@ import type {
   Step3Level,
   QuizRecommendation,
 } from "../../types/types";
+
 import "dotenv/config";
 const contextForValidation = `You are analyzing a conversation between Anna (career counselor) and a user.
 
@@ -480,3 +481,4 @@ export class AiService {
 }
 
 export const aiService = new AiService(process.env.GEMINI_API_KEY!);
+

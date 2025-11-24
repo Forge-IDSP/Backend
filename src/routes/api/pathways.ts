@@ -1,4 +1,3 @@
-// src/routes/api/pathways.ts
 import { Hono } from "hono";
 import {
   upsertPathway,
@@ -10,13 +9,11 @@ import {
 
 const app = new Hono();
 
-// GET /api/pathways → list all
 app.get("/", async (c) => {
   const items = await listPathways();
   return c.json(items);
 });
 
-// GET /api/pathways/:id → get one
 app.get("/:id", async (c) => {
   const id = c.req.param("id");
   const p = await getPathwayById(id);
@@ -28,7 +25,6 @@ app.get("/:id", async (c) => {
   return c.json(p);
 });
 
-// POST /api/pathways → create or update
 app.post("/", async (c) => {
   const body = (await c.req.json()) as Partial<Pathway>;
 
@@ -43,7 +39,6 @@ app.post("/", async (c) => {
   return c.json(saved);
 });
 
-// DELETE /api/pathways/:id → delete
 app.delete("/:id", async (c) => {
   const id = c.req.param("id");
   await deletePathwayById(id);

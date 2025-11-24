@@ -11,6 +11,28 @@ import {
   text
 } from "drizzle-orm/pg-core";
 
+export type Step = { title: string; subtitle?: string; meta?: string };
+
+export type MyPathwayAiData = {
+  trade?: string;
+  quizRecommendation?: {
+    careerName: string;
+    summary: string;
+    reasons: string[];
+    jobGrowthNote?: string;
+
+  };
+  careerIntro?: {
+    checkpoints: string[];
+    onboardingMessage: string;
+  };
+  apprenticeLevels?: {
+    title: string;
+    items: string[];
+  }[];
+};
+
+
 export const badges = pgTable("badges", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 100 }).notNull().unique(), // Name of the specific badge for querying
@@ -86,7 +108,7 @@ export const careerPaths = pgTable("career_paths", {
 export const pathways = pgTable("pathways", {
     id: text("id").notNull(),
     templateSlug: text("template_slug").notNull(),
-    steps: jsonb("steps").notNull(),         
+    steps: jsonb("steps").$type<Step[]>().notNull(),        
     updatedAt: timestamp("updated_at", {
       withTimezone: true,
     }).notNull(),
@@ -95,6 +117,48 @@ export const pathways = pgTable("pathways", {
     pk: primaryKey({ columns: [table.id] }),
   })
 );
+
+export const myPathways = pgTable("my_pathways", {
+  id: serial("id").primaryKey(),
+
+  userId: varchar("user_id", { length: 255 }).notNull(), // Clerk userId
+
+  templateId: text("template_id").references(() => pathways.id),
+
+  // UI fields
+  title: varchar("title", { length: 255 }).notNull(),
+  aiSummary: text("ai_summary"), // 1–3 sentence summary
+  aiShortLabel: varchar("ai_short_label", { length: 150 }),
+
+  steps: jsonb("steps").$type<Step[]>().notNull(),
+
+aiData: jsonb("ai_data").$type<MyPathwayAiData>(),
+
+
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+});
+
+export const myPathwayBadges = pgTable(
+  "my_pathway_badges",
+  {
+    pathwayId: integer("pathway_id")
+      .notNull()
+      .references(() => myPathways.id, { onDelete: "cascade" }),
+
+    badgeId: integer("badge_id")
+      .notNull()
+      .references(() => badges.id, { onDelete: "cascade" }),
+  },
+  (table) => ({
+    pk: primaryKey({ columns: [table.pathwayId, table.badgeId] }),
+  })
+);
+
 
 // jobdetail = job + dailyroutines + jobskills + careerpath
 export const jobsRelations = relations(jobs, ({ many }) => ({
@@ -131,3 +195,22 @@ export const employers = pgTable("employers", {
   description: varchar("description", { length: 500 }).notNull(),
   logo: varchar("logo", { length: 255 }),
 });
+
+
+export const myPathwaysRelations = relations(myPathways, ({ many }) => ({
+  badges: many(myPathwayBadges),
+}));
+
+export const myPathwayBadgesRelations = relations(
+  myPathwayBadges,
+  ({ one }) => ({
+    pathway: one(myPathways, {
+      fields: [myPathwayBadges.pathwayId],
+      references: [myPathways.id],
+    }),
+    badge: one(badges, {
+      fields: [myPathwayBadges.badgeId],
+      references: [badges.id],
+    }),
+  })
+);

@@ -7,6 +7,8 @@ import { dbRoute } from "./src/routes/api/db";
 import { simulationRoute } from "./src/routes/api/simulation";
 import userRoute from "./src/routes/api/users";
 import pathwaysRoute from "./src/routes/api/pathways"
+import myPathwaysRoute from "./src/routes/api/my-pathways";
+
 
 
 const app = new Hono();
@@ -29,5 +31,8 @@ app.route("/api/ai", aiRoute);
 app.route("/api/db", dbRoute);
 app.route("/api/simulation", simulationRoute);
 app.route("/api/pathways", pathwaysRoute);
+app.route("/api/my-pathways", myPathwaysRoute);
+
+
 
 export default app;
