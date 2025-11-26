@@ -362,18 +362,18 @@ export class AiService {
       Be encouraging and positive about moving forward.
       End with a statement like "Let's move forward!" or "Time to advance!" 
       DO NOT ask "What are you curious about?" or any other questions.
-      Keep the message to 2-3 sentences.`;
+      Keep the message to 2-3 sentences maximum, under 40 words`;
     } else if (context.isProgressionQuestion && !context.isReady) {
       contextPrompt = `The user isn't ready to move forward yet from Step ${step}.
       Offer encouragement and ask what additional information they need.
       DO NOT ask about progression again.
-      Keep the message to 2-3 sentences.`;
+      Keep the message to 2-3 sentences maximum, under 40 words`;
     } else {
       contextPrompt = `Continue the conversation naturally for Step ${step}. 
       Help the user explore skilled trades careers based on their interests and questions.
       After 2-3 meaningful exchanges, you may ask if they're ready to move forward.
       Focus on providing helpful information about their current stage.
-      Keep the message to 2-3 sentences.`;
+      Keep the message to 2-3 sentences maximum, under 40 words`;
     }
 
     const aiRaw = await this._gemini.models.generateContent({
@@ -481,4 +481,3 @@ export class AiService {
 }
 
 export const aiService = new AiService(process.env.GEMINI_API_KEY!);
-
