@@ -240,7 +240,8 @@ export class AiService {
   - Level 4: Complex tasks, mentoring others, preparing for Red Seal/C of Q exam
 
   Write in simple, clear language for grade 9-12 students.
-  Each level should have 3-4 specific, practical skills they would actually learn in BC.
+  Each level should have 3 specific, practical skills they would actually learn in BC.
+  Each sentence shouldn't be longer than 10 words.
   Be specific to ${careerName} trade practices in British Columbia.`,
         responseMimeType: "application/json",
         responseSchema: {
@@ -423,6 +424,7 @@ export class AiService {
         - "ready to move on"              
         - "Let's learn about the next step"
         - "What comes after foundation?"
+        - "yes"
         
         Only mark isProgressionQuestion as true when YOU ask if they want to move forward.
         Only mark isReady as true when they clearly indicate readiness to learn about apprenticeships.`;
@@ -435,7 +437,8 @@ export class AiService {
         - "Let's move on"
         - "What's next?"
         - "I understand, let's continue"
-        
+        - "yes"
+
         Only mark isProgressionQuestion as true when YOU ask if they want to move forward.
         Only mark isReady as true when they clearly indicate readiness to progress.`;
 
@@ -459,7 +462,8 @@ export class AiService {
         - Career opportunities after completion
         
         Be encouraging and informative. Only ask about progression when appropriate.
-        Keep the message to 2-3 sentences.`;
+        Keep the message to 2 sentences.
+        Total word count shouldn't exceed 25`;
 
       case 3:
         return `${baseInstruction} You're discussing completed apprenticeship levels.
@@ -472,7 +476,8 @@ export class AiService {
         - Next steps in their career path
         
         Be encouraging about their completion and answer their questions thoroughly.
-        Keep the message to 2-3 sentences.`;
+        Keep the message to 2 sentences.
+        Total word count shouldn't exceed 25`;
 
       default:
         return baseInstruction;
