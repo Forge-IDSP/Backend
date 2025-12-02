@@ -127,7 +127,7 @@ export const myPathways = pgTable("my_pathways", {
 
   // UI fields
   title: varchar("title", { length: 255 }).notNull(),
-  aiSummary: text("ai_summary"), // 1–3 sentence summary
+  aiSummary: text("ai_summary"),
   aiShortLabel: varchar("ai_short_label", { length: 150 }),
 
   steps: jsonb("steps").$type<Step[]>().notNull(),
@@ -141,7 +141,12 @@ aiData: jsonb("ai_data").$type<MyPathwayAiData>(),
   updatedAt: timestamp("updated_at", { withTimezone: true })
     .defaultNow()
     .notNull(),
-});
+},
+  (table) => ({
+    pk: primaryKey({ columns: [table.id] }),
+    // only one pathway per title
+    uniqUserTitle: unique().on(table.userId, table.title),
+  }));
 
 export const myPathwayBadges = pgTable(
   "my_pathway_badges",
