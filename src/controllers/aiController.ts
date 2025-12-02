@@ -221,6 +221,85 @@ public async createMyPathway(c: Context) {
   }
 }
 
+  public async createMyPathwayFromCareer(c: Context) {
+  try {
+    const { userId, careerName } = await c.req.json<{
+      userId: string;
+      careerName: string;
+    }>();
+
+    if (!userId || !careerName) {
+      return c.json(
+        {
+          success: false,
+          error: "userId and careerName are required",
+          data: null,
+        },
+        400
+      );
+    }
+
+    const trade = careerName;
+
+    // 1. Intro
+    const careerIntro = await this._aiService.initializeCareerPath(trade);
+
+    // 2. Levels
+    const apprenticeLevels =
+      await this._aiService.getApprenticeLevels(trade);
+
+    // 3. Steps (simple version)
+    const steps: Step[] = [
+      {
+        title: `Welcome to the ${trade} Pathway`,
+        subtitle: careerIntro.onboardingMessage,
+        meta: "Intro",
+      },
+      ...careerIntro.checkpoints.map((cp: string, index: number) => ({
+        title: cp,
+        subtitle: apprenticeLevels[index]
+          ? apprenticeLevels[index].items.join(" • ")
+          : undefined,
+        meta: `Stage ${index + 1}`,
+      })),
+    ];
+
+    // 4. Summary + aiData
+    const aiSummary = careerIntro.onboardingMessage;
+    const aiData = {
+      trade,
+      careerIntro,
+      apprenticeLevels,
+    };
+
+    // 5. Title + badges
+    const title = `${trade} Pathway`;
+    const badgeNames = ["jobs", trade.toLowerCase()];
+
+    // 6. Save using existing myPathwayService (respects uniq (userId, title))
+    const saved = await createMyPathway({
+      userId,
+      title,
+      steps,
+      aiSummary,
+      aiData,
+      badgeNames,
+    });
+
+    return c.json({ success: true, data: saved, error: null }, 200);
+  } catch (error) {
+    console.error("Error creating pathway from career:", error);
+    return c.json(
+      {
+        success: false,
+        error: "Failed to create pathway from career",
+        data: null,
+      },
+      500
+    );
+  }
+}
+
 
 }
 

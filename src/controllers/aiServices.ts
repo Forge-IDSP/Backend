@@ -9,7 +9,6 @@ import type {
 } from "../../types/types";
 
 import "dotenv/config";
-
 const contextForValidation = `You are analyzing a conversation between Anna (career counselor) and a user.
 
   TASK 1: Is this a progression question?
@@ -31,7 +30,6 @@ const contextForValidation = `You are analyzing a conversation between Anna (car
   - Express confusion or ask questions
   - Give vague or non-committal responses
   - Change the subject`;
-
 const sourceOfTruth = `You are Anna, a BC skilled trades career counselor guiding users through certification stages.
 
   CORE BEHAVIOR:
@@ -50,10 +48,9 @@ const sourceOfTruth = `You are Anna, a BC skilled trades career counselor guidin
   3. NEVER ask about progression twice in a row
 
   CONTENT GUIDELINES:
-  - Mention real requirements (Journeyperson/Certificate of Qualification, FSR-E license, apprenticeship hours)
+  - Mention real requirements (Red Seal, FSR-E license, apprenticeship hours)
   - Provide accurate info on wages, job prospects, career paths
   - This is a gamified career simulation with progressive stages`;
-
 const initializeCareerSystemInstruction = `
   You are Anna, a friendly BC skilled trades career guide for high school students (grades 9–12).
 
@@ -72,7 +69,6 @@ const initializeCareerSystemInstruction = `
     "items": ["string", "string", "string", "string"]
   }
   `;
-
 const quizSystemInstruction = `
   You are Anna, a friendly BC skilled trades career guide for high school students.
 
@@ -93,7 +89,6 @@ const quizSystemInstruction = `
   - Focus on real tasks, opportunities, and next steps
   - Return ONLY JSON matching the response schema
   `;
-
 export class AiService {
   private _gemini: GoogleGenAI;
 
@@ -135,8 +130,7 @@ export class AiService {
       }
     );
   }
-
-  // Done
+  //Done
   public async getCareerData(data: QuizAnswers) {
     const { interest, environment, priority, workStyle } = data;
 
@@ -188,7 +182,7 @@ export class AiService {
       contents: `
         For someone interested in becoming a ${trade} in BC:
         
-        1. List the major career progression stages (Entry Level, Apprentice, Journeyperson, Master if applicable). Do NOT create a separate "Red Seal" stage; Red Seal is a credential, not a level.
+        1. List the major career progression stages (Entry Level, Apprentice, Journeyman, Red Seal, Master if applicable)
         2. Create a welcoming onboarding message that:
           - Welcomes them to their ${trade} journey
           - Briefly explains what the Entry Level stage involves
@@ -242,8 +236,8 @@ export class AiService {
   GUIDELINES:
   - Level 1: Foundation skills, safety training, basic tool use
   - Level 2: Intermediate skills, working under supervision, understanding BC codes
-  - Level 3: Advanced techniques, some independent work, preparing for journeyperson / Certificate of Qualification exam
-  - Level 4: Complex tasks, mentoring others, preparing for full certification and independent work
+  - Level 3: Advanced techniques, some independent work, preparing for IP exam
+  - Level 4: Complex tasks, mentoring others, preparing for Red Seal/C of Q exam
 
   Write in simple, clear language for grade 9-12 students.
   Each level should have 3 specific, practical skills they would actually learn in BC.
@@ -285,7 +279,6 @@ export class AiService {
     const result = JSON.parse(aiRaw.text!) as { levels: Step3Level[] };
     return result.levels;
   }
-
   private async checkNextPoint(
     userResponse: string,
     currentQuestion: string,
@@ -413,7 +406,7 @@ export class AiService {
     return {
       text: data.text,
       type: "assistant_text",
-      shouldProgress,
+      shouldProgress, // 🔥 Simple boolean instead of checkpoint index
     };
   }
 
@@ -477,7 +470,7 @@ export class AiService {
         
         Topics you can discuss:
         - What they learned through the levels
-        - Journeyperson / Certificate of Qualification process
+        - Red Seal certification process
         - Career advancement opportunities
         - Skills development journey
         - Next steps in their career path

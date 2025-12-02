@@ -15,4 +15,7 @@ aiRoute.post("/matchCareer", async (c: any) => {
 aiRoute.post("/createMyPathway", async(c: any) =>{
   return await aiController.createMyPathway(c);
 })
+aiRoute.post("/createMyPathwayFromCareer", async(c: any) =>{
+  return await aiController.createMyPathwayFromCareer(c)
+});
 
