@@ -127,7 +127,7 @@ export const myPathways = pgTable("my_pathways", {
 
   // UI fields
   title: varchar("title", { length: 255 }).notNull(),
-  aiSummary: text("ai_summary"), // 1–3 sentence summary
+  aiSummary: text("ai_summary"),
   aiShortLabel: varchar("ai_short_label", { length: 150 }),
 
   steps: jsonb("steps").$type<Step[]>().notNull(),
