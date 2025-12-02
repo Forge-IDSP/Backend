@@ -141,7 +141,12 @@ aiData: jsonb("ai_data").$type<MyPathwayAiData>(),
   updatedAt: timestamp("updated_at", { withTimezone: true })
     .defaultNow()
     .notNull(),
-});
+},
+  (table) => ({
+    pk: primaryKey({ columns: [table.id] }),
+    // only one pathway per title
+    uniqUserTitle: unique().on(table.userId, table.title),
+  }));
 
 export const myPathwayBadges = pgTable(
   "my_pathway_badges",
