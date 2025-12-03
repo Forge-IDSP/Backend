@@ -2,17 +2,20 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "target": "ES2020",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
 
-    "noEmit": false,          // <— emit JS!
-    "allowJs": true,
-    "lib": ["ES2020"],
+    "outDir": "dist",
+    "rootDir": ".",
 
-    "jsx": "react-jsx",       // harmless, can stay
-    "verbatimModuleSyntax": true,
+    "noEmit": false,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+
+    "verbatimModuleSyntax": false,
     "allowImportingTsExtensions": false
   },
-  "include": ["app.ts", "src/**/*.ts"],
-  "exclude": ["node_modules"]
+  "include": ["app.ts", "index.ts", "src/**/*.ts"],
+  "exclude": ["node_modules", "dist", "src/scripts"]
 }

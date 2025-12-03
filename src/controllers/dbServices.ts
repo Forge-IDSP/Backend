@@ -204,4 +204,4 @@ export const dbService = new DbService(db, process.env.REDIS_SERVER!);
 // console.log(await dbService.getBadgesByPattern("electrician"));
 
 // console.log(await dbService.getIncomeCardsByTrade("electrician"));
-console.log(await dbService.getIncomeCardsByTrade("electrician"));
+// console.log(await dbService.getIncomeCardsByTrade("electrician"));
