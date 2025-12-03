@@ -23,7 +23,7 @@ app.use(
   })
 );
 app.use("*", logger());
-app.use("*", clerkMiddleware());
+app.use("/api/user/*", clerkMiddleware());
 app.get("/", (c) => c.text("Hono!"));
 
 app.route("/api/user", userRoute);

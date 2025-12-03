@@ -21,7 +21,7 @@ app.use("*", (0, cors_1.cors)({
     credentials: true,
 }));
 app.use("*", (0, logger_1.logger)());
-app.use("*", (0, clerk_auth_1.clerkMiddleware)());
+app.use("/api/user/*", (0, clerk_auth_1.clerkMiddleware)());
 app.get("/", (c) => c.text("Hono!"));
 app.route("/api/user", users_js_1.default);
 app.route("/api/ai", ai_js_1.aiRoute);

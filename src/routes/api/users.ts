@@ -7,14 +7,16 @@ const users = new Hono();
 users.get("/profile", async (c) => {
   const auth = getAuth(c);
 
-  const user = await clerkClient.users.getUser(auth!.userId!);
-  console.log("@@@@");
-  console.log(user);
-  if (!auth?.userId) {
+    if (!auth || !auth.userId) {
     return c.json({ error: "Unauthorized" }, 401);
   }
 
-  return c.text("hello");
+  const user = await clerkClient.users.getUser(auth!.userId!);
+
+  console.log("@@@@ user profile");
+  console.log(user);
+
+    return c.json({ id: user.id, email: user.emailAddresses[0]?.emailAddress });
 });
 
 export default users;
