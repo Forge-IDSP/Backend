@@ -1,0 +1,223 @@
+// controllers/AiController.ts
+import { aiService, AiService } from "../controllers/aiServices";
+import { createMyPathway } from "../controllers/myPathwayService";
+export class AiController {
+    constructor(aiService) {
+        this._aiService = aiService;
+    }
+    async getChatResponse(c) {
+        try {
+            const { userResponse, chatHistory, step, // Add step to the request body type
+             } = await c.req.json();
+            const response = await this._aiService.aiResponse(userResponse, chatHistory, step // Pass step to the service
+            );
+            console.log(response);
+            return c.json({
+                success: true,
+                data: response,
+                error: null,
+            }, 200);
+        }
+        catch (error) {
+            console.error(error);
+            return c.json({
+                success: false,
+                error: "Failed to generate AI response",
+                data: null,
+            }, 500);
+        }
+    }
+    async getCareerData(c) {
+        const { careerName } = await c.req.json();
+        // const response = this._aiService.getCareerData(careerName);
+    }
+    async initializeCareer(c) {
+        try {
+            const body = await c.req.json();
+            const { trade } = body;
+            if (!trade || typeof trade !== "string") {
+                return c.json({
+                    success: false,
+                    error: "Trade is required",
+                    data: null,
+                }, 400);
+            }
+            const checkpoints = await this._aiService.initializeCareerPath(trade);
+            return c.json({
+                success: true,
+                data: {
+                    trade,
+                    checkpoints,
+                },
+                error: null,
+            }, 200);
+        }
+        catch (error) {
+            console.error("Error in initializeCareer:", error);
+            return c.json({
+                success: false,
+                error: "Failed to initialize career path",
+                data: null,
+            }, 500);
+        }
+    }
+    async matchCareer(c) {
+        const { userId, quizAnswers, } = await c.req.json();
+        console.log(quizAnswers);
+        const data = await this._aiService.getCareerData(quizAnswers);
+        const newMsg = {
+            id: `quiz_ack_${Date.now()}`,
+            content: {
+                type: "assistant_text",
+                careerRecommendation: data.careerName,
+                text: `Nice work! Based on your answers, I recommend the trade: **${data.careerName}**.
+
+${data.summary}
+
+Why it fits you:
+- ${data.reasons.join("\n- ")}
+`,
+            },
+        };
+        return c.json(newMsg, 200);
+    }
+    async getApprenticeLevels(c) {
+        try {
+            const careerName = c.req.param("careerName");
+            if (!careerName) {
+                return c.json({
+                    error: "Career name is required",
+                    levels: [],
+                }, 400);
+            }
+            const decodedCareerName = decodeURIComponent(careerName);
+            console.log(`Generating apprentice levels for: ${decodedCareerName}`);
+            const levels = await this._aiService.getApprenticeLevels(decodedCareerName);
+            return c.json({
+                levels,
+            });
+        }
+        catch (error) {
+            console.error("Error generating apprentice levels:", error);
+        }
+    }
+    async createMyPathway(c) {
+        try {
+            const { userId, quizAnswers } = await c.req.json();
+            // 1. Quiz
+            const quiz = await this._aiService.getCareerData(quizAnswers);
+            const trade = quiz.careerName;
+            // 2. Intro
+            const careerIntro = await this._aiService.initializeCareerPath(trade);
+            // 3. Levels
+            const apprenticeLevels = await this._aiService.getApprenticeLevels(trade);
+            // 4. Steps
+            const steps = [
+                {
+                    title: `Welcome to the ${trade} Pathway`,
+                    subtitle: careerIntro.onboardingMessage,
+                    meta: "Intro",
+                },
+                ...careerIntro.checkpoints.map((cp, index) => ({
+                    title: cp,
+                    subtitle: apprenticeLevels[index]
+                        ? apprenticeLevels[index].items.join(" • ")
+                        : undefined,
+                    meta: `Stage ${index + 1}`,
+                })),
+            ];
+            // 5. Summary
+            const aiSummary = quiz.summary;
+            // 6. Full AI payload
+            const aiData = {
+                trade,
+                quizRecommendation: quiz,
+                careerIntro,
+                apprenticeLevels,
+            };
+            // 7. Title
+            const title = `${trade} Pathway`;
+            // 8. Badges
+            const badgeNames = ["jobs", trade.toLowerCase()];
+            // 9. Save
+            const saved = await createMyPathway({
+                userId,
+                title,
+                steps,
+                aiSummary,
+                aiData,
+                badgeNames,
+            });
+            return c.json({ success: true, data: saved, error: null }, 200);
+        }
+        catch (error) {
+            console.error("Error creating pathway:", error);
+            return c.json({
+                success: false,
+                error: "Failed to create pathway",
+                data: null,
+            }, 500);
+        }
+    }
+    async createMyPathwayFromCareer(c) {
+        try {
+            const { userId, careerName } = await c.req.json();
+            if (!userId || !careerName) {
+                return c.json({
+                    success: false,
+                    error: "userId and careerName are required",
+                    data: null,
+                }, 400);
+            }
+            const trade = careerName;
+            // 1. Intro
+            const careerIntro = await this._aiService.initializeCareerPath(trade);
+            // 2. Levels
+            const apprenticeLevels = await this._aiService.getApprenticeLevels(trade);
+            // 3. Steps (simple version)
+            const steps = [
+                {
+                    title: `Welcome to the ${trade} Pathway`,
+                    subtitle: careerIntro.onboardingMessage,
+                    meta: "Intro",
+                },
+                ...careerIntro.checkpoints.map((cp, index) => ({
+                    title: cp,
+                    subtitle: apprenticeLevels[index]
+                        ? apprenticeLevels[index].items.join(" • ")
+                        : undefined,
+                    meta: `Stage ${index + 1}`,
+                })),
+            ];
+            // 4. Summary + aiData
+            const aiSummary = careerIntro.onboardingMessage;
+            const aiData = {
+                trade,
+                careerIntro,
+                apprenticeLevels,
+            };
+            // 5. Title + badges
+            const title = `${trade} Pathway`;
+            const badgeNames = ["jobs", trade.toLowerCase()];
+            // 6. Save using existing myPathwayService (respects uniq (userId, title))
+            const saved = await createMyPathway({
+                userId,
+                title,
+                steps,
+                aiSummary,
+                aiData,
+                badgeNames,
+            });
+            return c.json({ success: true, data: saved, error: null }, 200);
+        }
+        catch (error) {
+            console.error("Error creating pathway from career:", error);
+            return c.json({
+                success: false,
+                error: "Failed to create pathway from career",
+                data: null,
+            }, 500);
+        }
+    }
+}
+export const aiController = new AiController(aiService);
