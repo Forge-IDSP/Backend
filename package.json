@@ -3,8 +3,9 @@
   "module": "index.ts",
   "type": "module",
   "scripts": {
-    "start": "bun index.ts",
-    "dev": "bun --watch index.ts",
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node app.js",
+    "dev": "bun index.ts",
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
@@ -13,7 +14,9 @@
   "private": true,
   "devDependencies": {
     "@types/bun": "latest",
-    "drizzle-kit": "^0.31.5"
+    "@types/node": "^24.10.1",
+    "drizzle-kit": "^0.31.5",
+    "typescript": "^5.9.3"
   },
   "peerDependencies": {
     "typescript": "^5.9.3"

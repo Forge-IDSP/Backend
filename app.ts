@@ -2,12 +2,12 @@ import { clerkMiddleware } from "@hono/clerk-auth";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
-import { aiRoute } from "./src/routes/api/ai";
-import { dbRoute } from "./src/routes/api/db";
-import { simulationRoute } from "./src/routes/api/simulation";
-import userRoute from "./src/routes/api/users";
-import pathwaysRoute from "./src/routes/api/pathways"
-import myPathwaysRoute from "./src/routes/api/my-pathways";
+import { aiRoute } from "./src/routes/api/ai.js";
+import { dbRoute } from "./src/routes/api/db.js";
+import { simulationRoute } from "./src/routes/api/simulation.js";
+import userRoute from "./src/routes/api/users.js";
+import pathwaysRoute from "./src/routes/api/pathways.js"
+import myPathwaysRoute from "./src/routes/api/my-pathways.js";
 
 
 
