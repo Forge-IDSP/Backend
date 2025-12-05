@@ -11,7 +11,7 @@ type CreateMyPathwayArgs = {
   aiData?: MyPathwayAiData;
   badgeNames?: string[];
 };
-
+/////////
 export async function createMyPathway({
   userId,
   title,

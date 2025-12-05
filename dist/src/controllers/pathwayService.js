@@ -4,7 +4,6 @@ exports.upsertPathway = upsertPathway;
 exports.getPathwayById = getPathwayById;
 exports.listPathways = listPathways;
 exports.deletePathwayById = deletePathwayById;
-// src/controllers/pathwayService.ts
 const client_1 = require("../db/client");
 const schema_1 = require("../db/schema");
 const drizzle_orm_1 = require("drizzle-orm");

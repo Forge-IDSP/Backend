@@ -4,6 +4,7 @@ exports.createMyPathway = createMyPathway;
 const client_1 = require("../db/client");
 const schema_1 = require("../db/schema");
 const drizzle_orm_1 = require("drizzle-orm");
+/////////
 async function createMyPathway({ userId, title, steps, aiSummary, aiData, badgeNames = [], }) {
     // Check user already has the same pathway title
     const existing = await client_1.db.query.myPathways.findFirst({
