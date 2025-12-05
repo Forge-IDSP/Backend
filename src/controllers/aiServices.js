@@ -147,7 +147,7 @@ export class AiService {
             contents: `
         For someone interested in becoming a ${trade} in BC:
         
-        1. List the major career progression stages (Entry Level, Apprentice, Journeyman/Red Seal, Master if applicable)
+        1. List the major career progression stages (Entry Level, Apprentice, Journeyperson/Red Seal, Master if applicable)
         2. Create a welcoming onboarding message that:
           - Welcomes them to their ${trade} journey
           - Briefly explains what the Entry Level stage involves
