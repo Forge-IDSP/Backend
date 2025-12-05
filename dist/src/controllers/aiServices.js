@@ -150,7 +150,7 @@ class AiService {
             contents: `
         For someone interested in becoming a ${trade} in BC:
         
-        1. List the major career progression stages (Entry Level, Apprentice, Journeyperson/Red Seal, Master if applicable)
+        1. List the major career progression stages (Entry Level, Apprentice, Journey Person/Red Seal, Master if applicable)
         2. Create a welcoming onboarding message that:
           - Welcomes them to their ${trade} journey
           - Briefly explains what the Entry Level stage involves
@@ -203,7 +203,7 @@ class AiService {
   - Level 1: Foundation skills, safety training, basic tool use
   - Level 2: Intermediate skills, working under supervision, understanding BC codes
   - Level 3: Advanced techniques, some independent work, preparing for IP exam
-  - Level 4: Complex tasks, mentoring others, preparing for journeyperson/Red Seal (C of Q) exam
+  - Level 4: Complex tasks, mentoring others, preparing for Journey Person/Red Seal (C of Q) exam
 
   Write in simple, clear language for grade 9-12 students.
   Each level should have 3 specific, practical skills they would actually learn in BC.
@@ -408,7 +408,7 @@ class AiService {
         
         Topics you can discuss:
         - What they learned through the levels
-        - Journeyperson / Red Seal certification process
+        - Journey Person / Red Seal certification process
         - Career advancement opportunities
         - Skills development journey
         - Next steps in their career path

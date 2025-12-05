@@ -36,7 +36,7 @@ export type SkillLevel = {
 };
 
 export type CareerPath = {
-  level: "Apprentice" | "Journeyperson" | "Master";
+  level: "Apprentice" | "Journey Person" | "Master";
   description: string;
   minIncome: number;
   income: number;
