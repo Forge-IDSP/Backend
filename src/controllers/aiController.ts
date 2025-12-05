@@ -27,7 +27,7 @@ export class AiController {
       const response = await this._aiService.aiResponse(
         userResponse,
         chatHistory,
-        step // Pass step to the service
+        step
       );
       console.log(response);
       return c.json(

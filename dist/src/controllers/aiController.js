@@ -12,8 +12,7 @@ class AiController {
         try {
             const { userResponse, chatHistory, step, // Add step to the request body type
              } = await c.req.json();
-            const response = await this._aiService.aiResponse(userResponse, chatHistory, step // Pass step to the service
-            );
+            const response = await this._aiService.aiResponse(userResponse, chatHistory, step);
             console.log(response);
             return c.json({
                 success: true,
