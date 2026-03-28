@@ -18,7 +18,7 @@ app.use(
   cors({
     // origin is default route for react+vite, we can decide to use built in CORS solution on vite or we can manually
     // do it here once our website goes live.
-    origin: ["http://localhost:8081"],
+    origin: "*",
     credentials: true,
   })
 );
