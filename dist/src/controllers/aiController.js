@@ -106,14 +106,26 @@ Why it fits you:
     async createMyPathway(c) {
         try {
             const { userId, quizAnswers } = await c.req.json();
-            // 1. Quiz
+            if (!userId) {
+                return c.json({ success: false, error: "userId is required", data: null }, 400);
+            }
+            if (!quizAnswers) {
+                return c.json({ success: false, error: "quizAnswers are required", data: null }, 400);
+            }
+            console.log("createMyPathway payload:", { userId, quizAnswers });
             const quiz = await this._aiService.getCareerData(quizAnswers);
+            if (!quiz?.careerName) {
+                throw new Error("AI did not return a valid careerName");
+            }
             const trade = quiz.careerName;
-            // 2. Intro
             const careerIntro = await this._aiService.initializeCareerPath(trade);
-            // 3. Levels
+            if (!careerIntro?.checkpoints || !Array.isArray(careerIntro.checkpoints)) {
+                throw new Error("careerIntro.checkpoints is invalid");
+            }
             const apprenticeLevels = await this._aiService.getApprenticeLevels(trade);
-            // 4. Steps
+            if (!Array.isArray(apprenticeLevels)) {
+                throw new Error("apprenticeLevels is invalid");
+            }
             const steps = [
                 {
                     title: `Welcome to the ${trade} Pathway`,
@@ -122,26 +134,19 @@ Why it fits you:
                 },
                 ...careerIntro.checkpoints.map((cp, index) => ({
                     title: cp,
-                    subtitle: apprenticeLevels[index]
-                        ? apprenticeLevels[index].items.join(" • ")
-                        : undefined,
+                    subtitle: apprenticeLevels[index]?.items?.join(" • "),
                     meta: `Stage ${index + 1}`,
                 })),
             ];
-            // 5. Summary
             const aiSummary = quiz.summary;
-            // 6. Full AI payload
             const aiData = {
                 trade,
                 quizRecommendation: quiz,
                 careerIntro,
                 apprenticeLevels,
             };
-            // 7. Title
             const title = `${trade} Pathway`;
-            // 8. Badges
             const badgeNames = ["jobs", trade.toLowerCase()];
-            // 9. Save
             const saved = await (0, myPathwayService_1.createMyPathway)({
                 userId,
                 title,
@@ -156,7 +161,7 @@ Why it fits you:
             console.error("Error creating pathway:", error);
             return c.json({
                 success: false,
-                error: "Failed to create pathway",
+                error: error instanceof Error ? error.message : "Failed to create pathway",
                 data: null,
             }, 500);
         }
@@ -216,7 +221,9 @@ Why it fits you:
             console.error("Error creating pathway from career:", error);
             return c.json({
                 success: false,
-                error: "Failed to create pathway from career",
+                error: error instanceof Error
+                    ? error.message
+                    : "Failed to create pathway from career",
                 data: null,
             }, 500);
         }

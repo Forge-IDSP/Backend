@@ -3,11 +3,11 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { aiRoute } from "./src/routes/api/ai.js";
-import { dbRoute } from "./src/routes/api/db.js";
+// import { dbRoute } from "./src/routes/api/db.js";
 import { simulationRoute } from "./src/routes/api/simulation.js";
 import userRoute from "./src/routes/api/users.js";
-import pathwaysRoute from "./src/routes/api/pathways.js"
-import myPathwaysRoute from "./src/routes/api/my-pathways.js";
+// import pathwaysRoute from "./src/routes/api/pathways.js"
+import { myPathwaysRoute } from "./src/routes/api/my-pathways.js";
 
 
 
@@ -28,9 +28,9 @@ app.get("/", (c) => c.text("Hono!"));
 
 app.route("/api/user", userRoute);
 app.route("/api/ai", aiRoute);
-app.route("/api/db", dbRoute);
+// app.route("/api/db", dbRoute);
 app.route("/api/simulation", simulationRoute);
-app.route("/api/pathways", pathwaysRoute);
+// app.route("/api/pathways", pathwaysRoute);
 app.route("/api/my-pathways", myPathwaysRoute);
 
 

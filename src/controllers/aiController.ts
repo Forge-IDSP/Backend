@@ -157,17 +157,39 @@ public async createMyPathway(c: Context) {
   try {
     const { userId, quizAnswers } = await c.req.json();
 
-    // 1. Quiz
+    if (!userId) {
+      return c.json(
+        { success: false, error: "userId is required", data: null },
+        400
+      );
+    }
+
+    if (!quizAnswers) {
+      return c.json(
+        { success: false, error: "quizAnswers are required", data: null },
+        400
+      );
+    }
+
+    console.log("createMyPathway payload:", { userId, quizAnswers });
+
     const quiz = await this._aiService.getCareerData(quizAnswers);
+    if (!quiz?.careerName) {
+      throw new Error("AI did not return a valid careerName");
+    }
+
     const trade = quiz.careerName;
 
-    // 2. Intro
     const careerIntro = await this._aiService.initializeCareerPath(trade);
+    if (!careerIntro?.checkpoints || !Array.isArray(careerIntro.checkpoints)) {
+      throw new Error("careerIntro.checkpoints is invalid");
+    }
 
-    // 3. Levels
     const apprenticeLevels = await this._aiService.getApprenticeLevels(trade);
+    if (!Array.isArray(apprenticeLevels)) {
+      throw new Error("apprenticeLevels is invalid");
+    }
 
-    // 4. Steps
     const steps: Step[] = [
       {
         title: `Welcome to the ${trade} Pathway`,
@@ -176,17 +198,12 @@ public async createMyPathway(c: Context) {
       },
       ...careerIntro.checkpoints.map((cp: string, index: number) => ({
         title: cp,
-        subtitle: apprenticeLevels[index]
-          ? apprenticeLevels[index].items.join(" • ")
-          : undefined,
+        subtitle: apprenticeLevels[index]?.items?.join(" • "),
         meta: `Stage ${index + 1}`,
       })),
     ];
 
-    // 5. Summary
     const aiSummary = quiz.summary;
-
-    // 6. Full AI payload
     const aiData = {
       trade,
       quizRecommendation: quiz,
@@ -194,13 +211,9 @@ public async createMyPathway(c: Context) {
       apprenticeLevels,
     };
 
-    // 7. Title
     const title = `${trade} Pathway`;
-
-    // 8. Badges
     const badgeNames = ["jobs", trade.toLowerCase()];
 
-    // 9. Save
     const saved = await createMyPathway({
       userId,
       title,
@@ -213,14 +226,17 @@ public async createMyPathway(c: Context) {
     return c.json({ success: true, data: saved, error: null }, 200);
   } catch (error) {
     console.error("Error creating pathway:", error);
-    return c.json({
-      success: false,
-      error: "Failed to create pathway",
-      data: null,
-    }, 500);
+
+    return c.json(
+      {
+        success: false,
+        error: error instanceof Error ? error.message : "Failed to create pathway",
+        data: null,
+      },
+      500
+    );
   }
 }
-
   public async createMyPathwayFromCareer(c: Context) {
   try {
     const { userId, careerName } = await c.req.json<{
@@ -287,17 +303,21 @@ public async createMyPathway(c: Context) {
     });
 
     return c.json({ success: true, data: saved, error: null }, 200);
-  } catch (error) {
-    console.error("Error creating pathway from career:", error);
-    return c.json(
-      {
-        success: false,
-        error: "Failed to create pathway from career",
-        data: null,
-      },
-      500
-    );
-  }
+} catch (error) {
+  console.error("Error creating pathway from career:", error);
+
+  return c.json(
+    {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : "Failed to create pathway from career",
+      data: null,
+    },
+    500
+  );
+}
 }
 
 

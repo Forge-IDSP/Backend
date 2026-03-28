@@ -1,63 +1,46 @@
 import { Hono } from "hono";
 import { db } from "../../db/client";
 import { myPathways } from "../../db/schema";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 
-const app = new Hono();
+export const myPathwaysRoute = new Hono();
 
-// GET /api/my-pathways?userId=xxxx → list all for user
-app.get("/", async (c) => {
+// GET /api/my-pathways?userId=xxx
+myPathwaysRoute.get("/", async (c) => {
   const userId = c.req.query("userId");
+  if (!userId) return c.json({ error: "userId required" }, 400);
 
-  if (!userId) {
-    return c.json({ error: "userId is required" }, 400);
-  }
-
-  const rows = await db
-    .select()
-    .from(myPathways)
-    .where(eq(myPathways.userId, userId));
+  const rows = await db.query.myPathways.findMany({
+    where: (mp, { eq }) => eq(mp.userId, userId),
+    orderBy: (mp, { desc }) => [desc(mp.updatedAt)],
+  });
 
   return c.json({ data: rows });
 });
 
-// GET /api/my-pathways/:id → get one
-app.get("/:id", async (c) => {
+// GET /api/my-pathways/:id?userId=xxx
+myPathwaysRoute.get("/:id", async (c) => {
+  const id = Number(c.req.param("id"));
   const userId = c.req.query("userId");
-  const id = c.req.param("id");
+  if (!userId) return c.json({ error: "userId required" }, 400);
 
-  if (!userId) {
-    return c.json({ error: "userId is required" }, 400);
-  }
+  const row = await db.query.myPathways.findFirst({
+    where: (mp, { eq, and }) => and(eq(mp.id, id), eq(mp.userId, userId)),
+  });
 
-  const rows = await db
-    .select()
-    .from(myPathways)
-    .where(eq(myPathways.id, Number(id)));
-
-  const row = rows[0];
-
-  if (!row || row.userId !== userId) {
-    return c.json({ error: "Not found" }, 404);
-  }
-
-  return c.json({ data: row });
+  if (!row) return c.json({ error: "Not found" }, 404);
+  return c.json(row);
 });
 
 // DELETE /api/my-pathways/:id
-app.delete("/:id", async (c) => {
-  const userId = c.req.query("userId");
-  const id = c.req.param("id");
-
-  if (!userId) {
-    return c.json({ error: "userId is required" }, 400);
-  }
+myPathwaysRoute.delete("/:id", async (c) => {
+  const id = Number(c.req.param("id"));
+  const { userId } = await c.req.json();
+  if (!userId) return c.json({ error: "userId required" }, 400);
 
   await db
     .delete(myPathways)
-    .where(eq(myPathways.id, Number(id)));
+    .where(and(eq(myPathways.id, id), eq(myPathways.userId, userId)));
 
   return c.json({ success: true });
 });
-
-export default app;
