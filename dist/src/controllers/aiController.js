@@ -172,33 +172,43 @@ Why it fits you:
                 }, 400);
             }
             const trade = careerName;
-            // 1. Intro
-            const careerIntro = await this._aiService.initializeCareerPath(trade);
-            // 2. Levels
-            const apprenticeLevels = await this._aiService.getApprenticeLevels(trade);
-            // 3. Steps (simple version)
-            const steps = [
-                {
-                    title: `Welcome to the ${trade} Pathway`,
-                    subtitle: careerIntro.onboardingMessage,
-                    meta: "Intro",
-                },
-                ...careerIntro.checkpoints.map((cp, index) => ({
-                    title: cp,
-                    subtitle: apprenticeLevels[index]
-                        ? apprenticeLevels[index].items.join(" • ")
-                        : undefined,
-                    meta: `Stage ${index + 1}`,
-                })),
-            ];
-            // 4. Summary + aiData
-            const aiSummary = careerIntro.onboardingMessage;
-            const aiData = {
-                trade,
-                careerIntro,
-                apprenticeLevels,
-            };
-            // 5. Title + badges
+            let steps;
+            let aiSummary;
+            let aiData;
+            // Try to enrich with AI, but fall back to basic data if Gemini is unavailable
+            try {
+                const careerIntro = await this._aiService.initializeCareerPath(trade);
+                const apprenticeLevels = await this._aiService.getApprenticeLevels(trade);
+                steps = [
+                    {
+                        title: `Welcome to the ${trade} Pathway`,
+                        subtitle: careerIntro.onboardingMessage,
+                        meta: "Intro",
+                    },
+                    ...careerIntro.checkpoints.map((cp, index) => ({
+                        title: cp,
+                        subtitle: apprenticeLevels[index]
+                            ? apprenticeLevels[index].items.join(" • ")
+                            : undefined,
+                        meta: `Stage ${index + 1}`,
+                    })),
+                ];
+                aiSummary = careerIntro.onboardingMessage;
+                aiData = { trade, careerIntro, apprenticeLevels };
+            }
+            catch {
+                // Gemini unavailable — save with basic data
+                steps = [
+                    { title: `Welcome to the ${trade} Pathway`, meta: "Intro" },
+                    { title: "Apprentice Level 1", meta: "Stage 1" },
+                    { title: "Apprentice Level 2", meta: "Stage 2" },
+                    { title: "Apprentice Level 3", meta: "Stage 3" },
+                    { title: "Journeyperson", meta: "Stage 4" },
+                ];
+                aiSummary = `Explore a career as a ${trade}.`;
+                aiData = { trade };
+            }
+            // Title + badges
             const title = `${trade} Pathway`;
             const badgeNames = ["jobs", trade.toLowerCase()];
             // 6. Save using existing myPathwayService (respects uniq (userId, title))

@@ -241,38 +241,45 @@ public async createMyPathway(c: Context) {
 
     const trade = careerName;
 
-    // 1. Intro
-    const careerIntro = await this._aiService.initializeCareerPath(trade);
+    let steps: Step[];
+    let aiSummary: string | undefined;
+    let aiData: any;
 
-    // 2. Levels
-    const apprenticeLevels =
-      await this._aiService.getApprenticeLevels(trade);
+    // Try to enrich with AI, but fall back to basic data if Gemini is unavailable
+    try {
+      const careerIntro = await this._aiService.initializeCareerPath(trade);
+      const apprenticeLevels = await this._aiService.getApprenticeLevels(trade);
 
-    // 3. Steps (simple version)
-    const steps: Step[] = [
-      {
-        title: `Welcome to the ${trade} Pathway`,
-        subtitle: careerIntro.onboardingMessage,
-        meta: "Intro",
-      },
-      ...careerIntro.checkpoints.map((cp: string, index: number) => ({
-        title: cp,
-        subtitle: apprenticeLevels[index]
-          ? apprenticeLevels[index].items.join(" • ")
-          : undefined,
-        meta: `Stage ${index + 1}`,
-      })),
-    ];
+      steps = [
+        {
+          title: `Welcome to the ${trade} Pathway`,
+          subtitle: careerIntro.onboardingMessage,
+          meta: "Intro",
+        },
+        ...careerIntro.checkpoints.map((cp: string, index: number) => ({
+          title: cp,
+          subtitle: apprenticeLevels[index]
+            ? apprenticeLevels[index].items.join(" • ")
+            : undefined,
+          meta: `Stage ${index + 1}`,
+        })),
+      ];
+      aiSummary = careerIntro.onboardingMessage;
+      aiData = { trade, careerIntro, apprenticeLevels };
+    } catch {
+      // Gemini unavailable — save with basic data
+      steps = [
+        { title: `Welcome to the ${trade} Pathway`, meta: "Intro" },
+        { title: "Apprentice Level 1", meta: "Stage 1" },
+        { title: "Apprentice Level 2", meta: "Stage 2" },
+        { title: "Apprentice Level 3", meta: "Stage 3" },
+        { title: "Journeyperson", meta: "Stage 4" },
+      ];
+      aiSummary = `Explore a career as a ${trade}.`;
+      aiData = { trade };
+    }
 
-    // 4. Summary + aiData
-    const aiSummary = careerIntro.onboardingMessage;
-    const aiData = {
-      trade,
-      careerIntro,
-      apprenticeLevels,
-    };
-
-    // 5. Title + badges
+    // Title + badges
     const title = `${trade} Pathway`;
     const badgeNames = ["jobs", trade.toLowerCase()];
 
