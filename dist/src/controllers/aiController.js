@@ -231,9 +231,7 @@ Why it fits you:
             console.error("Error creating pathway from career:", error);
             return c.json({
                 success: false,
-                error: error instanceof Error
-                    ? error.message
-                    : "Failed to create pathway from career",
+                error: error instanceof Error ? error.message : String(error),
                 data: null,
             }, 500);
         }

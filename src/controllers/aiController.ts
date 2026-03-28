@@ -316,10 +316,7 @@ public async createMyPathway(c: Context) {
   return c.json(
     {
       success: false,
-      error:
-        error instanceof Error
-          ? error.message
-          : "Failed to create pathway from career",
+      error: error instanceof Error ? error.message : String(error),
       data: null,
     },
     500
